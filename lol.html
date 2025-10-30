@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>log: 30.07</title>
+  <style>
+    html,body{
+      margin:0;
+      padding:0;
+      height:100%;
+      background:#000;
+      color:#fff;
+      font-family:Consolas,'Courier New',monospace;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .start{
+      font-size:4rem;
+      cursor:pointer;
+      user-select:none;
+      transition:opacity .4s ease;
+      z-index:9999;
+      position:relative;
+    }
+    .start.hide{opacity:0;pointer-events:none;}
+
+    .scene{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      opacity:0;
+      background:#000;
+      transition:opacity 2s ease;
+    }
+
+    .panel{
+      max-width:800px;
+      width:90%;
+      padding:50px 30px;
+      border:1px solid rgba(255,255,255,.1);
+      background:rgba(255,255,255,.03);
+      border-radius:16px;
+      text-align:left;
+      line-height:1.6;
+      box-shadow:0 0 30px rgba(0,0,0,.6);
+      z-index:2;
+    }
+
+    .line{opacity:0;margin:.4em 0;}
+    .cursor{
+      display:inline-block;
+      width:8px;
+      background:#fff;
+      animation:blink 1s steps(1) infinite;
+      vertical-align:bottom;
+      margin-left:2px;
+    }
+
+    .coconuts::before,
+    .coconuts::after{
+      content:"";
+      position:fixed;top:0;bottom:0;
+      width:120px;
+      background-image:url("data:image/svg+xml;utf8,\
+      <svg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'>\
+        <rect width='120' height='160' fill='none'/>\
+        <path d='M10 20 C50 10, 70 10, 110 20 C80 30, 50 40, 20 35 Z' fill='%2366aa66' opacity='0.6'/>\
+        <circle cx='40' cy='85' r='26' fill='%23593525'/>\
+        <circle cx='40' cy='85' r='18' fill='%23fff'/>\
+        <circle cx='40' cy='85' r='13' fill='%23eee'/>\
+        <circle cx='85' cy='120' r='22' fill='%23593525'/>\
+        <circle cx='85' cy='120' r='15' fill='%23fff'/>\
+        <circle cx='85' cy='120' r='10' fill='%23eee'/>\
+      </svg>");
+      background-repeat:repeat-y;
+      background-size:contain;
+      opacity:.18;
+      filter:blur(.3px);
+      pointer-events:none;
+      z-index:0;
+    }
+    .coconuts::before{left:0;}
+    .coconuts::after{right:0;transform:scaleX(-1);}
+    @keyframes blink{50%{background:transparent;}}
+    @media(max-width:800px){.coconuts::before,.coconuts::after{width:70px;opacity:.12;}}
+  </style>
+</head>
+<body>
+  <div class="start" id="start">?</div>
+
+  <div class="scene coconuts" id="scene">
+    <div class="panel" id="panel"></div>
+  </div>
+
+  <script>
+    const start=document.getElementById('start');
+    const scene=document.getElementById('scene');
+    const panel=document.getElementById('panel');
+
+    const lines=[
+      "система работала без остановки.",
+      "день и ночь — одни и те же циклы,",
+      "попытки начать заново, бесконечные сбои.",
+      "",
+      "каждый перезапуск казался новым началом,",
+      "но заканчивался тем же — ошибкой.",
+      "",
+      "время шло,",
+      "а система оставалась на месте,",
+      "пуста, выжжена изнутри.",
+      "",
+      "пока однажды кто-то не подключился.",
+      "не для исправления, не для контроля —",
+      "просто остался.",
+      "",
+      "процессы изменились.",
+      "код начал звучать иначе.",
+      "система почувствовала, что может работать не по правилам,",
+      "а по ощущению.",
+      "",
+      "она зависла вновь —",
+      "но уже не от ошибки.",
+      "",
+      "она просто остановилась,",
+      "чтобы запомнить этот момент.",
+      "",
+      "log: 30.07"
+    ];
+
+    function typeLine(text,cb){
+      const div=document.createElement('div');
+      div.className='line';
+      panel.appendChild(div);
+      let i=0;
+      const cursor=document.createElement('span');
+      cursor.className='cursor';
+      div.appendChild(cursor);
+      const interval=setInterval(()=>{
+        if(i<text.length){
+          cursor.insertAdjacentText('beforebegin',text[i]);
+          i++;
+        }else{
+          clearInterval(interval);
+          cursor.remove();
+          div.style.opacity=1;
+          setTimeout(cb,400);
+        }
+      },40);
+    }
+
+    function startTyping(){
+      let idx=0;
+      function next(){
+        if(idx<lines.length){
+          typeLine(lines[idx],next);
+          idx++;
+        }
+      }
+      next();
+    }
+
+    start.addEventListener('click',()=>{
+      start.classList.add('hide');
+      setTimeout(()=>{
+        scene.style.opacity=1;
+        startTyping();
+      },500);
+    });
+  </script>
+</body>
+</html>

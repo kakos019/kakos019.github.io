@@ -1,178 +1,322 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>log: 30.07</title>
-  <style>
-    html,body{
-      margin:0;
-      padding:0;
-      height:100%;
-      background:#000;
-      color:#fff;
-      font-family:Consolas,'Courier New',monospace;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-    }
+    <meta charset="UTF-8">
+    <title>ki11 me pls</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #080808;
+            color: #b0b0b0;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+            cursor: none;
+            user-select: none;
+        }
 
-    .start{
-      font-size:4rem;
-      cursor:pointer;
-      user-select:none;
-      transition:opacity .4s ease;
-      z-index:9999;
-      position:relative;
-    }
-    .start.hide{opacity:0;pointer-events:none;}
+        #stage {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            transition: filter 0.2s;
+        }
 
-    .scene{
-      position:fixed;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-      opacity:0;
-      background:#000;
-      transition:opacity 2s ease;
-    }
+        .noise {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.08;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJnoiPjxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIwLjY1IiBudW1PY3RhdmVzPSIzIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI2cpIiBvcGFjaXR5PSIwLjUiLz48L3N2Zz4=');
+        }
+        
+        .vignette {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 30%, black 110%);
+            pointer-events: none;
+            z-index: 6;
+            transition: background 1s ease;
+        }
 
-    .panel{
-      max-width:800px;
-      width:90%;
-      padding:50px 30px;
-      border:1px solid rgba(255,255,255,.1);
-      background:rgba(255,255,255,.03);
-      border-radius:16px;
-      text-align:left;
-      line-height:1.6;
-      box-shadow:0 0 30px rgba(0,0,0,.6);
-      z-index:2;
-    }
+        #cursor-follower {
+            position: absolute;
+            pointer-events: none;
+            font-size: 1.4rem;
+            white-space: nowrap;
+            mix-blend-mode: exclusion;
+            z-index: 20;
+            transition: transform 0.1s, color 0.2s;
+        }
 
-    .line{opacity:0;margin:.4em 0;}
-    .cursor{
-      display:inline-block;
-      width:8px;
-      background:#fff;
-      animation:blink 1s steps(1) infinite;
-      vertical-align:bottom;
-      margin-left:2px;
-    }
+        #bg-word {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 9rem;
+            color: #111;
+            font-weight: 900;
+            z-index: 1;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
 
-    .coconuts::before,
-    .coconuts::after{
-      content:"";
-      position:fixed;top:0;bottom:0;
-      width:120px;
-      background-image:url("data:image/svg+xml;utf8,\
-      <svg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'>\
-        <rect width='120' height='160' fill='none'/>\
-        <path d='M10 20 C50 10, 70 10, 110 20 C80 30, 50 40, 20 35 Z' fill='%2366aa66' opacity='0.6'/>\
-        <circle cx='40' cy='85' r='26' fill='%23593525'/>\
-        <circle cx='40' cy='85' r='18' fill='%23fff'/>\
-        <circle cx='40' cy='85' r='13' fill='%23eee'/>\
-        <circle cx='85' cy='120' r='22' fill='%23593525'/>\
-        <circle cx='85' cy='120' r='15' fill='%23fff'/>\
-        <circle cx='85' cy='120' r='10' fill='%23eee'/>\
-      </svg>");
-      background-repeat:repeat-y;
-      background-size:contain;
-      opacity:.18;
-      filter:blur(.3px);
-      pointer-events:none;
-      z-index:0;
-    }
-    .coconuts::before{left:0;}
-    .coconuts::after{right:0;transform:scaleX(-1);}
-    @keyframes blink{50%{background:transparent;}}
-    @media(max-width:800px){.coconuts::before,.coconuts::after{width:70px;opacity:.12;}}
-  </style>
+        .blood-drip {
+            position: absolute;
+            width: 2px;
+            background: #8a0303;
+            top: 0;
+            z-index: 15;
+            opacity: 0.9;
+            animation: drip 3s ease-in forwards;
+            box-shadow: 0 0 8px #ff0000;
+            border-radius: 50%;
+        }
+        @keyframes drip {
+            0% { height: 0; opacity: 1; width: 4px; }
+            100% { height: 120vh; opacity: 0; width: 2px;}
+        }
+
+        .crosshair {
+            position: absolute;
+            width: 40px; height: 40px;
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 30;
+            display: none;
+        }
+        .crosshair::before, .crosshair::after { content: ''; position: absolute; background: rgba(255, 0, 0, 0.5); }
+        .crosshair::before { top: 5px; bottom: 5px; left: 19px; width: 2px; }
+        .crosshair::after { left: 5px; right: 5px; top: 19px; height: 2px; }
+
+        #final-msg {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #888;
+            font-size: 1rem;
+            opacity: 0;
+            z-index: 100;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            pointer-events: none;
+            letter-spacing: 2px;
+        }
+
+        .collapse-anim {
+            animation: tv-off 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+            background: white !important;
+        }
+        @keyframes tv-off {
+            0% { transform: scale(1, 1); filter: brightness(1); }
+            40% { transform: scale(1, 0.005); filter: brightness(5); }
+            100% { transform: scale(0, 0); filter: brightness(0); }
+        }
+
+    </style>
 </head>
 <body>
-  <div class="start" id="start">?</div>
 
-  <div class="scene coconuts" id="scene">
-    <div class="panel" id="panel"></div>
-  </div>
+    <div id="stage">
+        <div class="noise"></div>
+        <div class="vignette"></div>
+        <div id="bg-word">НАБЛЮДАЙ</div>
+        <div id="cursor-follower"></div>
+        <div id="crosshair" class="crosshair"></div>
+    </div>
 
-  <script>
-    const start=document.getElementById('start');
-    const scene=document.getElementById('scene');
-    const panel=document.getElementById('panel');
+    <div id="final-msg"></div>
 
-    const lines=[
-      "система работала без остановки.",
-      "день и ночь — одни и те же циклы,",
-      "попытки начать заново, бесконечные сбои.",
-      "",
-      "каждый перезапуск казался новым началом,",
-      "но заканчивался тем же — ошибкой.",
-      "",
-      "время шло,",
-      "а система оставалась на месте,",
-      "пуста, выжжена изнутри.",
-      "",
-      "пока однажды кто-то не подключился.",
-      "не для исправления, не для контроля —",
-      "просто остался.",
-      "",
-      "процессы изменились.",
-      "код начал звучать иначе.",
-      "система почувствовала, что может работать не по правилам,",
-      "а по ощущению.",
-      "",
-      "она зависла вновь —",
-      "но уже не от ошибки.",
-      "",
-      "она просто остановилась,",
-      "чтобы запомнить этот момент.",
-      "",
-      "log: 30.07"
-    ];
+    <script>
+        const script = [
+            { text: "Are you watching closely?", bg: "СМОТРИ", mode: "normal" },
+            { text: "Si vis pacem, para bellum", bg: "ВОЙНА", mode: "aim" },
+            { text: "Consequences", bg: "ПОСЛЕДСТВИЯ", mode: "blood_buildup" }, 
+            { text: "Одержимость разрушила жизни", bg: "ВИНА", mode: "chaos" },
+            { text: "БЕССИЛИЕ", bg: "ПУСТОТА", mode: "paralysis" },
+            { text: "Focus.", bg: "I", mode: "precision" },
+            { text: "Commitment.", bg: "II", mode: "precision" },
+            { text: "Sheer Will.", bg: "III", mode: "precision" },
+            { text: "I'm thinking I'm back", bg: "", mode: "end_sequence" }
+        ];
 
-    function typeLine(text,cb){
-      const div=document.createElement('div');
-      div.className='line';
-      panel.appendChild(div);
-      let i=0;
-      const cursor=document.createElement('span');
-      cursor.className='cursor';
-      div.appendChild(cursor);
-      const interval=setInterval(()=>{
-        if(i<text.length){
-          cursor.insertAdjacentText('beforebegin',text[i]);
-          i++;
-        }else{
-          clearInterval(interval);
-          cursor.remove();
-          div.style.opacity=1;
-          setTimeout(cb,400);
+        let step = 0;
+        let isGlitching = false;
+        let bloodLevel = 0;
+        let mode = "normal"; 
+        
+        let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
+        let followerX = window.innerWidth/2, followerY = window.innerHeight/2;
+        
+        const stage = document.getElementById('stage');
+        const follower = document.getElementById('cursor-follower');
+        const bgWord = document.getElementById('bg-word');
+        const crosshair = document.getElementById('crosshair');
+        const vignette = document.querySelector('.vignette');
+        const finalMsg = document.getElementById('final-msg');
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animate() {
+            let speed = 0.08;
+
+            if (mode === "paralysis") {
+                speed = 0.005;
+                mouseY = window.innerHeight + 200; 
+                bgWord.style.transform = `translate(-50%, -50%) scale(1.1)`;
+            }
+
+            if (mode === "aim") {
+                crosshair.style.display = "block";
+                crosshair.style.left = mouseX + 'px';
+                crosshair.style.top = mouseY + 'px';
+                speed = 0.15;
+            } else {
+                crosshair.style.display = "none";
+            }
+
+            if (mode === "precision") {
+                speed = 0.25; 
+                bgWord.style.color = "#1a1a1a"; 
+            }
+
+            followerX += (mouseX - followerX) * speed;
+            followerY += (mouseY - followerY) * speed;
+            follower.style.left = followerX + 'px';
+            follower.style.top = followerY + 'px';
+
+            if(mode !== "paralysis" && mode !== "precision") {
+                const t = Date.now() * 0.002;
+                follower.style.transform = `translate(${Math.sin(t)*5}px, ${Math.cos(t)*5}px)`;
+            } else {
+                follower.style.transform = `translate(0px, 0px)`;
+            }
+
+            requestAnimationFrame(animate);
         }
-      },40);
-    }
+        animate();
 
-    function startTyping(){
-      let idx=0;
-      function next(){
-        if(idx<lines.length){
-          typeLine(lines[idx],next);
-          idx++;
+        function spawnBlood(x, y, amount) {
+            for(let i=0; i<amount; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'blood-drip';
+                const offset = (Math.random() - 0.5) * 40;
+                drop.style.left = (x + offset) + 'px';
+                drop.style.top = y + 'px';
+                drop.style.width = (Math.random() * 4 + 2) + 'px'; 
+                drop.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                stage.appendChild(drop); 
+                setTimeout(() => drop.remove(), 4000);
+            }
         }
-      }
-      next();
-    }
 
-    start.addEventListener('click',()=>{
-      start.classList.add('hide');
-      setTimeout(()=>{
-        scene.style.opacity=1;
-        startTyping();
-      },500);
-    });
-  </script>
+        const symbols = "XY#/_<>?789!@";
+        function glitchText(text, element) {
+            let iteration = 0;
+            isGlitching = true;
+            const originalText = text;
+            element.style.fontSize = text.length > 20 ? "1rem" : "1.4rem";
+
+            const interval = setInterval(() => {
+                element.innerText = originalText
+                    .split("")
+                    .map((letter, index) => {
+                        if (index < iteration) return originalText[index];
+                        return symbols[Math.floor(Math.random() * symbols.length)];
+                    })
+                    .join("");
+                
+                if (iteration >= originalText.length) { 
+                    clearInterval(interval);
+                    isGlitching = false;
+                }
+                iteration += 1 / 2;
+            }, 25);
+        }
+
+        glitchText(script[0].text, follower);
+
+        document.addEventListener('mousedown', (e) => {
+            if (isGlitching && mode !== "blood_buildup") return;
+
+            if (mode === "blood_buildup") {
+                bloodLevel++;
+                if (bloodLevel === 1) {
+                    spawnBlood(e.clientX, e.clientY, 1);
+                    follower.style.color = "#ff6666";
+                    vignette.style.background = "radial-gradient(circle, transparent 30%, #300000 110%)";
+                    return;
+                }
+                if (bloodLevel === 2) {
+                    spawnBlood(e.clientX, e.clientY, 3);
+                    follower.style.color = "#ff0000";
+                    vignette.style.background = "radial-gradient(circle, transparent 20%, #500000 100%)";
+                    bgWord.style.color = "#300";
+                    return;
+                }
+                if (bloodLevel === 3) {
+                    spawnBlood(e.clientX, e.clientY, 8);
+                }
+            }
+
+            step++;
+            
+            if (step < script.length) {
+                const scene = script[step];
+                mode = scene.mode;
+
+                if (scene.text !== "Consequences") {
+                     if(mode !== "end_sequence") follower.style.color = "#b0b0b0";
+                     follower.style.textShadow = "none";
+                }
+
+                bgWord.innerText = scene.bg;
+
+                if (mode === "precision") {
+                    follower.style.color = "#ffffff"; 
+                    follower.style.fontWeight = "bold";
+                    vignette.style.background = "radial-gradient(circle, transparent 30%, black 110%)"; 
+                    bgWord.style.color = "#111";
+                }
+
+                if(mode === "paralysis") follower.style.color = "#444"; 
+
+                glitchText(scene.text, follower);
+            } else {
+                endGame();
+            }
+        });
+
+        function endGame() {
+            stage.classList.add('collapse-anim');
+            
+            setTimeout(() => {
+                stage.style.display = 'none'; 
+                document.body.style.cursor = 'default';
+                
+                finalMsg.style.opacity = 1;
+                typeWriter("правда скучная и страшная.", finalMsg);
+            }, 1000);
+        }
+
+        function typeWriter(text, el) {
+            let i = 0;
+            function type() {
+                if(i < text.length) {
+                    el.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, Math.random() * 100 + 50);
+                } else {
+                    el.innerHTML += "<span style='color:#800000'>.</span>";
+                }
+            }
+            type();
+        }
+    </script>
 </body>
 </html>
